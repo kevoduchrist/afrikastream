@@ -1,0 +1,14 @@
+const toast = document.getElementById('toast');
+function notify(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2800)}
+document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>{document.getElementById(btn.dataset.open).classList.add('open')}));
+document.querySelectorAll('.modal').forEach(modal=>{modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});modal.querySelector('.modal-close').addEventListener('click',()=>modal.classList.remove('open'))});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal').forEach(m=>m.classList.remove('open'))});
+document.getElementById('loginForm').addEventListener('submit',e=>{e.preventDefault();notify('La connexion sera disponible après configuration de Firebase.');e.target.closest('.modal').classList.remove('open')});
+document.getElementById('artistForm').addEventListener('submit',e=>{e.preventDefault();notify('Préinscription de démonstration : Firebase sera connecté à la prochaine étape.');e.target.closest('.modal').classList.remove('open');e.target.reset()});
+document.querySelectorAll('.chip').forEach(chip=>chip.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');const genre=chip.dataset.genre;document.querySelectorAll('.track-card').forEach(card=>card.style.display=genre==='Tous'||card.dataset.genre===genre?'':'none')}));
+const search=document.getElementById('searchInput');search.addEventListener('input',()=>{const q=search.value.toLowerCase().trim();document.querySelectorAll('.track-card').forEach(card=>card.style.display=(card.dataset.title+' '+card.dataset.artist+' '+card.dataset.genre).toLowerCase().includes(q)?'':'none')});
+function playCard(card){document.getElementById('nowTitle').textContent=card.dataset.title;document.getElementById('nowArtist').textContent=card.dataset.artist;document.getElementById('mainPlay').textContent='Ⅱ';notify('Aperçu du lecteur : ajoute les fichiers audio pour activer la lecture.')}
+document.querySelectorAll('.play-cover').forEach(btn=>btn.addEventListener('click',()=>playCard(btn.closest('.track-card'))));
+document.getElementById('mainPlay').addEventListener('click',e=>{e.currentTarget.textContent=e.currentTarget.textContent==='▶'?'Ⅱ':'▶';if(!document.getElementById('nowTitle').textContent.includes('Choisis'))notify('Le lecteur audio sera activé avec le catalogue musical.')});
+document.querySelectorAll('.heart').forEach(b=>b.addEventListener('click',()=>{b.textContent=b.textContent==='♡'?'♥':'♡';notify('Favoris : connexion nécessaire pour enregistrer ce titre.')}));
+document.querySelectorAll('.track-foot span:last-child').forEach(b=>b.addEventListener('click',()=>{b.textContent=b.textContent==='♡'?'♥':'♡';notify('Connecte-toi pour enregistrer tes favoris.')}));

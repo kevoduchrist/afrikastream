@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b0a">
+  <meta name="description" content="AfrikaStream — découvre, écoute et partage les sons qui font vibrer l'Afrique.">
+  <title>AfrikaStream — La musique africaine en mouvement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="AfrikaStream accueil">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span>Afrika<span class="brand-light">Stream</span></span>
+      </a>
+      <div class="side-label">MENU</div>
+      <nav class="side-nav">
+        <a class="nav-link active" href="#accueil"><span>⌂</span> Accueil</a>
+        <a class="nav-link" href="#tendances"><span>↗</span> Tendances</a>
+        <a class="nav-link" href="#artistes"><span>♬</span> Artistes</a>
+        <a class="nav-link" href="#bibliotheque"><span>▤</span> Ma bibliothèque</a>
+      </nav>
+      <div class="side-label playlist-label">TA MUSIQUE</div>
+      <div class="side-note">Connecte-toi pour retrouver tes titres favoris et tes téléchargements.</div>
+      <button class="outline-btn full" data-open="loginModal">Se connecter</button>
+      <div class="sidebar-bottom"><span class="live-dot"></span> La musique africaine, partout.</div>
+    </aside>
+
+    <main class="main-content" id="accueil">
+      <header class="topbar">
+        <button class="mobile-brand" aria-label="AfrikaStream"><span class="brand-mark"><i></i><i></i><i></i></span> AfrikaStream</button>
+        <div class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Rechercher un son, un artiste..." aria-label="Rechercher"></div>
+        <div class="top-actions">
+          <button class="text-btn" data-open="artistModal">Devenir artiste</button>
+          <button class="primary-btn small" data-open="loginModal">Connexion</button>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="live-dot"></span> LE SON DU CONTINENT</span>
+          <h1>La musique africaine<br>à <em>portée de clic.</em></h1>
+          <p>Découvre les talents d'ici, écoute tes sons préférés et fais vibrer toute l'Afrique.</p>
+          <div class="hero-actions"><a class="primary-btn" href="#tendances">Explorer les sons <b>↗</b></a><button class="ghost-btn" data-open="artistModal">Publier ma musique</button></div>
+          <div class="hero-stats"><div><strong>100%</strong><span>Vibrations africaines</span></div><div><strong>∞</strong><span>Découvertes musicales</span></div></div>
+        </div>
+        <div class="hero-art" aria-label="Illustration musicale">
+          <div class="sound-ring ring-one"></div><div class="sound-ring ring-two"></div>
+          <div class="hero-disc"><span class="disc-logo">AF<br><small>STREAM</small></span></div>
+          <div class="floating-tag tag-top">✦ NEW SOUND</div><div class="floating-tag tag-bottom">BENIN • AFRICA</div>
+          <div class="equalizer"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <section class="section" id="tendances">
+        <div class="section-heading"><div><span class="eyebrow">À NE PAS MANQUER</span><h2>En tendance au Bénin <span class="accent">↗</span></h2><p class="muted">Les sons à découvrir cette semaine.</p></div><a class="see-all" href="#tendances">Tout explorer <b>→</b></a></div>
+        <div class="chips" id="genreChips"><button class="chip selected" data-genre="Tous">Tous</button><button class="chip" data-genre="Afrobeats">Afrobeats</button><button class="chip" data-genre="Rap">Rap</button><button class="chip" data-genre="Gospel">Gospel</button><button class="chip" data-genre="Traditionnel">Traditionnel</button><button class="chip" data-genre="R&B">R&B</button></div>
+        <div class="track-grid" id="trackGrid">
+          <article class="track-card" data-title="Cotonou la nuit" data-artist="K-Dream" data-genre="Afrobeats" data-color="orange"><div class="cover cover-orange"><span>AFRO<br>VIBES</span><button class="play-cover" aria-label="Écouter">▶</button></div><div class="track-meta"><div><h3>Cotonou la nuit</h3><p>K-Dream</p></div><button class="more-btn" aria-label="Options">•••</button></div><div class="track-foot"><span>Afrobeats</span><span>♡</span></div></article>
+          <article class="track-card" data-title="RedCARD" data-artist="Freestyle" data-genre="Rap" data-color="red"><div class="cover cover-red"><span>Red<br>CARD</span><button class="play-cover" aria-label="Écouter">▶</button></div><div class="track-meta"><div><h3>RedCARD</h3><p>Freestyle</p></div><button class="more-btn" aria-label="Options">•••</button></div><div class="track-foot"><span>Rap</span><span>♡</span></div></article>
+          <article class="track-card" data-title="Grâce infinie" data-artist="Mira B" data-genre="Gospel" data-color="green"><div class="cover cover-green"><span>GRÂCE<br>INFINIE</span><button class="play-cover" aria-label="Écouter">▶</button></div><div class="track-meta"><div><h3>Grâce infinie</h3><p>Mira B</p></div><button class="more-btn" aria-label="Options">•••</button></div><div class="track-foot"><span>Gospel</span><span>♡</span></div></article>
+          <article class="track-card" data-title="Agbadja Flow" data-artist="T-Gang" data-genre="Traditionnel" data-color="gold"><div class="cover cover-gold"><span>AGBADJA<br>FLOW</span><button class="play-cover" aria-label="Écouter">▶</button></div><div class="track-meta"><div><h3>Agbadja Flow</h3><p>T-Gang</p></div><button class="more-btn" aria-label="Options">•••</button></div><div class="track-foot"><span>Traditionnel</span><span>♡</span></div></article>
+        </div>
+        <p class="demo-note">Aperçu de démonstration : les titres affichés sont des exemples. Les écoutes réelles seront activées après connexion du catalogue audio.</p>
+      </section>
+
+      <section class="artist-banner" id="artistes"><div class="artist-symbol">♫</div><div><span class="eyebrow">TU FAIS DE LA MUSIQUE ?</span><h2>Ta voix mérite d'être entendue.</h2><p>Crée ton espace artiste et prépare la publication de tes sons sur AfrikaStream.</p></div><button class="primary-btn" data-open="artistModal">Rejoindre AfrikaStream <b>↗</b></button></section>
+
+      <section class="section artist-section" id="bibliotheque"><div class="section-heading"><div><span class="eyebrow">ILS FONT LE SON</span><h2>Artistes à découvrir</h2></div><a class="see-all" href="#artistes">Voir les artistes →</a></div><div class="artist-row"><div class="artist-item"><div class="avatar avatar-a">KD</div><strong>K-Dream</strong><span>Afrobeats</span></div><div class="artist-item"><div class="avatar avatar-b">MB</div><strong>Mira B</strong><span>Gospel</span></div><div class="artist-item"><div class="avatar avatar-c">TG</div><strong>T-Gang</strong><span>Fusion</span></div><div class="artist-item"><div class="avatar avatar-d">RC</div><strong>RedCARD</strong><span>Freestyle</span></div></div></section>
+      <footer><span>© 2026 AfrikaStream</span><span>Fait pour les vibrations africaines.</span><a href="mailto:contact@afrikastream.com">Nous contacter</a></footer>
+    </main>
+  </div>
+
+  <div class="player-bar"><div class="now-playing"><div class="mini-cover">AF</div><div><strong id="nowTitle">Choisis un morceau</strong><span id="nowArtist">AfrikaStream</span></div><button class="heart">♡</button></div><div class="player-controls"><button class="control" aria-label="Précédent">|◀</button><button class="main-play" id="mainPlay" aria-label="Lecture">▶</button><button class="control" aria-label="Suivant">▶|</button><div class="progress"><span>0:00</span><div class="progress-line"><i></i></div><span>0:00</span></div></div><div class="volume">♫ <div class="volume-line"></div></div></div>
+
+  <div class="modal" id="loginModal" aria-hidden="true"><div class="modal-card"><button class="modal-close" aria-label="Fermer">×</button><span class="eyebrow">BIENVENUE</span><h2>Content de te revoir.</h2><p>Connecte-toi pour retrouver ta bibliothèque.</p><form id="loginForm"><label>Adresse e-mail<input type="email" placeholder="toi@exemple.com" required></label><label>Mot de passe<input type="password" placeholder="Ton mot de passe" required></label><button class="primary-btn full" type="submit">Se connecter</button></form><small>La connexion sera activée lors du branchement Firebase.</small></div></div>
+  <div class="modal" id="artistModal" aria-hidden="true"><div class="modal-card"><button class="modal-close" aria-label="Fermer">×</button><span class="eyebrow">ESPACE ARTISTE</span><h2>Fais entendre ton talent.</h2><p>Préinscris ton profil artiste. La publication sera ouverte après validation du compte.</p><form id="artistForm"><label>Nom d'artiste<input type="text" placeholder="Ton nom de scène" required></label><label>Adresse e-mail<input type="email" placeholder="toi@exemple.com" required></label><label>Numéro Mobile Money<input type="tel" placeholder="+229 ..." required></label><label>Ton style musical<select required><option value="">Choisir un style</option><option>Afrobeats</option><option>Rap</option><option>Gospel</option><option>R&B</option><option>Traditionnel</option><option>Autre</option></select></label><button class="primary-btn full" type="submit">Envoyer ma préinscription</button></form><small>Démo : aucune donnée n'est envoyée ni enregistrée.</small></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
