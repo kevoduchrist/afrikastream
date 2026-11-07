@@ -1,6 +1,3 @@
-// ======================================
-// AFRIKASTREAM - FIREBASE
-// ======================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 
@@ -23,371 +20,414 @@ import {
 
 import firebaseConfig from "./firebase-config.js";
 
-// Initialisation Firebase
+// ======================================
+// 1. INITIALISATION DE FIREBASE
+// ======================================
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Éléments du site
-const toast = document.getElementById("toast");
-const loginForm = document.getElementById("loginForm");
-const artistForm = document.getElementById("artistForm");
-
 // ======================================
-// NOTIFICATIONS
+// 2. OUTILS
 // ======================================
 
-function notify(message) {
-  if (!toast) return;
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
 
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
+function showMessage(message) {
+  alert(message);
 }
 
-// Traduction des erreurs Firebase
-function firebaseError(error) {
-  const errors = {
-    "auth/email-already-in-use": "Cette adresse e-mail possède déjà un compte.",
-    "auth/invalid-email": "Adresse e-mail invalide.",
-    "auth/weak-password": "Le mot de passe doit contenir au moins 6 caractères.",
-    "auth/invalid-credential": "E-mail ou mot de passe incorrect.",
-    "auth/user-disabled": "Ce compte a été désactivé.",
-    "auth/too-many-requests": "Trop de tentatives. Réessaie plus tard.",
-    "permission-denied": "Accès refusé. Vérifie les règles Firestore."
-  };
-
-  return errors[error.code] || error.message || "Une erreur est survenue.";
+function openModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add("active");
 }
 
-// ======================================
-// FENÊTRES MODALES
-// ======================================
+function closeModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove("active");
+}
 
-document.querySelectorAll("[data-open]").forEach(button => {
+// Fermer les fenêtres avec les boutons de fermeture
+$$(".close-modal, [data-close]").forEach((button) => {
   button.addEventListener("click", () => {
-    const modal = document.getElementById(button.dataset.open);
+    const modal = button.closest(".modal");
+    if (modal) modal.classList.remove("active");
+  });
+});
 
-    if (modal) {
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden", "false");
+// Fermer en cliquant à l'extérieur
+$$(".modal").forEach((modal) => {
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      modal.classList.remove("active");
     }
   });
 });
 
-function closeModal(modal) {
-  if (!modal) return;
+// ======================================
+// 3. OUVERTURE DES FENÊTRES
+// ======================================
 
-  modal.classList.remove("open");
-  modal.setAttribute("aria-hidden", "true");
-}
+$$("[data-open]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const modalId = button.dataset.open;
 
-document.querySelectorAll(".modal").forEach(modal => {
-  modal.addEventListener("click", event => {
-    if (event.target === modal) closeModal(modal);
+    if (modalId === "loginModal" && auth.currentUser) {
+      const confirmLogout = confirm(
+        "Tu es connecté. Veux-tu te déconnecter ?"
+      );
+
+      if (confirmLogout) {
+        signOut(auth)
+          .then(() => showMessage("Déconnexion réussie."))
+          .catch((error) => showMessage(error.message));
+      }
+
+      return;
+    }
+
+    openModal(modalId);
   });
-
-  const closeButton = modal.querySelector(".modal-close");
-
-  if (closeButton) {
-    closeButton.addEventListener("click", () => closeModal(modal));
-  }
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    document.querySelectorAll(".modal").forEach(closeModal);
-  }
 });
 
 // ======================================
-// CRÉATION DE COMPTE
+// 4. AFFICHAGE DE L'UTILISATEUR CONNECTÉ
 // ======================================
 
-// On ajoute un bouton "Créer un compte"
-// dans le formulaire de connexion.
+onAuthStateChanged(auth, (user) => {
+  const loginButtons = $$('[data-open="loginModal"]');
+
+  loginButtons.forEach((button) => {
+    button.textContent = user ? "Mon compte / Déconnexion" : "Connexion";
+  });
+});
+
+// ======================================
+// 5. INSCRIPTION ET CONNEXION
+// ======================================
+
+const loginForm = $("#loginForm");
+
 if (loginForm) {
-  const createButton = document.createElement("button");
+  const registerButton = document.createElement("button");
 
-  createButton.type = "button";
-  createButton.className = "outline-btn full";
-  createButton.textContent = "Créer un compte";
-  createButton.style.marginTop = "12px";
+  registerButton.type = "button";
+  registerButton.className = "primary-btn full";
+  registerButton.textContent = "Créer un compte";
 
-  loginForm.appendChild(createButton);
+  loginForm.appendChild(registerButton);
 
-  createButton.addEventListener("click", async () => {
-    const email = loginForm.querySelector('input[type="email"]').value.trim();
-    const password = loginForm.querySelector('input[type="password"]').value;
+  registerButton.addEventListener("click", async () => {
+    const email = loginForm.querySelector('input[type="email"]')?.value.trim();
+    const password = loginForm.querySelector('input[type="password"]')?.value;
 
     if (!email || !password) {
-      notify("Entre ton e-mail et un mot de passe.");
+      showMessage("Entre ton adresse e-mail et ton mot de passe.");
       return;
     }
 
     if (password.length < 6) {
-      notify("Le mot de passe doit contenir au moins 6 caractères.");
+      showMessage("Le mot de passe doit contenir au moins 6 caractères.");
       return;
     }
 
-    createButton.disabled = true;
-    createButton.textContent = "Création en cours...";
+    registerButton.disabled = true;
+    registerButton.textContent = "Création en cours...";
 
     try {
-      const result = await createUserWithEmailAndPassword(
+      const credential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      await setDoc(doc(db, "users", result.user.uid), {
-        email: result.user.email,
+      await setDoc(doc(db, "users", credential.user.uid), {
+        email: credential.user.email,
         role: "listener",
         createdAt: serverTimestamp()
       });
 
-      notify("Ton compte AfrikaStream est créé !");
-      closeModal(loginForm.closest(".modal"));
+      closeModal("loginModal");
       loginForm.reset();
 
+      showMessage("Bienvenue sur AfrikaStream ! Ton compte est créé.");
     } catch (error) {
-      console.error(error);
-      notify(firebaseError(error));
+      console.error("Erreur inscription :", error);
 
+      if (error.code === "auth/email-already-in-use") {
+        showMessage("Cette adresse possède déjà un compte. Connecte-toi.");
+      } else if (error.code === "auth/weak-password") {
+        showMessage("Ton mot de passe est trop faible.");
+      } else if (error.code === "auth/invalid-email") {
+        showMessage("L'adresse e-mail est invalide.");
+      } else {
+        showMessage("Erreur lors de la création : " + error.message);
+      }
     } finally {
-      createButton.disabled = false;
-      createButton.textContent = "Créer un compte";
+      registerButton.disabled = false;
+      registerButton.textContent = "Créer un compte";
     }
   });
-}
 
-// ======================================
-// CONNEXION
-// ======================================
-
-if (loginForm) {
-  loginForm.addEventListener("submit", async event => {
+  loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const email = loginForm.querySelector('input[type="email"]').value.trim();
-    const password = loginForm.querySelector('input[type="password"]').value;
-    const submitButton = loginForm.querySelector('button[type="submit"]');
+    const email = loginForm.querySelector('input[type="email"]')?.value.trim();
+    const password = loginForm.querySelector('input[type="password"]')?.value;
 
     if (!email || !password) {
-      notify("Remplis tous les champs.");
+      showMessage("Remplis tous les champs.");
       return;
     }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Connexion...";
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      notify("Connexion réussie !");
-
-      closeModal(loginForm.closest(".modal"));
+      closeModal("loginModal");
       loginForm.reset();
 
+      showMessage("Connexion réussie. Bienvenue sur AfrikaStream !");
     } catch (error) {
-      console.error(error);
-      notify(firebaseError(error));
+      console.error("Erreur connexion :", error);
 
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Se connecter";
+      if (error.code === "auth/invalid-credential") {
+        showMessage("E-mail ou mot de passe incorrect.");
+      } else {
+        showMessage("Erreur de connexion : " + error.message);
+      }
     }
   });
 }
 
 // ======================================
-// ÉTAT DU COMPTE ET DÉCONNEXION
+// 6. PRÉINSCRIPTION DES ARTISTES
 // ======================================
 
-onAuthStateChanged(auth, user => {
-  const loginButtons = document.querySelectorAll(
-    '[data-open="loginModal"]'
-  );
-
-  loginButtons.forEach(button => {
-    button.textContent = user ? "Mon compte" : "Connexion";
-
-    if (user) {
-      button.onclick = async () => {
-        const confirmation = confirm(
-          "Veux-tu te déconnecter de AfrikaStream ?"
-        );
-
-        if (confirmation) {
-          try {
-            await signOut(auth);
-            notify("Tu es déconnecté.");
-          } catch (error) {
-            notify(firebaseError(error));
-          }
-        }
-      };
-    } else {
-      button.onclick = () => {
-        document.getElementById("loginModal").classList.add("open");
-      };
-    }
-  });
-});
-
-// ======================================
-// PRÉINSCRIPTION ARTISTE
-// ======================================
+const artistForm = $("#artistForm");
 
 if (artistForm) {
-  artistForm.addEventListener("submit", async event => {
+  artistForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    const user = auth.currentUser;
+
+    if (!user) {
+      showMessage("Connecte-toi avant d'envoyer ta candidature.");
+      openModal("loginModal");
+      return;
+    }
+
     const inputs = artistForm.querySelectorAll("input");
-    const name = inputs[0].value.trim();
-    const email = inputs[1].value.trim();
-    const phone = inputs[2].value.trim();
-    const genre = artistForm.querySelector("select").value;
+    const artistName = inputs[0]?.value.trim();
+    const email = inputs[1]?.value.trim();
+    const phone = inputs[2]?.value.trim();
+    const genre = artistForm.querySelector("select")?.value;
+
+    if (!artistName || !email || !phone || !genre) {
+      showMessage("Remplis tous les champs du formulaire.");
+      return;
+    }
+
+    if (email.toLowerCase() !== user.email?.toLowerCase()) {
+      showMessage(
+        "Utilise la même adresse e-mail que celle de ton compte connecté."
+      );
+      return;
+    }
 
     const submitButton = artistForm.querySelector('button[type="submit"]');
 
-    if (!auth.currentUser) {
-      notify("Connecte-toi ou crée un compte avant ta préinscription.");
-      return;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Envoi en cours...";
     }
-
-    if (email.toLowerCase() !== auth.currentUser.email.toLowerCase()) {
-      notify("Utilise l'adresse e-mail de ton compte connecté.");
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Envoi en cours...";
 
     try {
       await addDoc(collection(db, "artistApplications"), {
-        userId: auth.currentUser.uid,
-        artistName: name,
-        email: email,
-        phone: phone,
-        genre: genre,
+        userId: user.uid,
+        artistName,
+        email: user.email,
+        phone,
+        genre,
         status: "pending",
         createdAt: serverTimestamp()
       });
 
-      notify("Ta préinscription artiste a été envoyée !");
-
-      closeModal(artistForm.closest(".modal"));
       artistForm.reset();
+      closeModal("artistModal");
 
+      showMessage(
+        "Ta candidature a bien été envoyée. Notre équipe l'examinera."
+      );
     } catch (error) {
-      console.error(error);
-      notify(firebaseError(error));
-
+      console.error("Erreur candidature artiste :", error);
+      showMessage("Impossible d'envoyer ta candidature : " + error.message);
     } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Envoyer ma préinscription";
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Envoyer ma préinscription";
+      }
     }
   });
 }
 
 // ======================================
-// FILTRES MUSICAUX
+// 7. RECHERCHE DE MUSIQUES
 // ======================================
 
-document.querySelectorAll(".chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(item => {
-      item.classList.remove("selected");
-    });
+const searchInput = $(
+  'input[type="search"], input[placeholder*="Rechercher"], input[placeholder*="rechercher"]'
+);
 
-    chip.classList.add("selected");
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+    const search = searchInput.value.toLowerCase().trim();
 
-    const genre = chip.dataset.genre;
-
-    document.querySelectorAll(".track-card").forEach(card => {
-      card.style.display =
-        genre === "Tous" || card.dataset.genre === genre ? "" : "none";
+    $$(".track-card, .music-card, .song-card").forEach((card) => {
+      const content = card.textContent.toLowerCase();
+      card.style.display = content.includes(search) ? "" : "none";
     });
   });
-});
+}
 
 // ======================================
-// RECHERCHE
+// 8. FILTRES PAR GENRE
 // ======================================
 
-const search = document.getElementById("searchInput");
+$$("[data-genre], .genre-filter").forEach((button) => {
+  button.addEventListener("click", () => {
+    const genre = (
+      button.dataset.genre || button.textContent
+    ).toLowerCase().trim();
 
-if (search) {
-  search.addEventListener("input", () => {
-    const query = search.value.toLowerCase().trim();
-
-    document.querySelectorAll(".track-card").forEach(card => {
-      const content = (
-        card.dataset.title + " " +
-        card.dataset.artist + " " +
-        card.dataset.genre
+    $$(".track-card, .music-card, .song-card").forEach((card) => {
+      const cardGenre = (
+        card.dataset.genre || card.textContent
       ).toLowerCase();
 
-      card.style.display = content.includes(query) ? "" : "none";
+      card.style.display =
+        genre === "tout" || genre === "tous" || cardGenre.includes(genre)
+          ? ""
+          : "none";
     });
-  });
-}
 
-// ======================================
-// LECTEUR DE DÉMONSTRATION
-// ======================================
+    $$(".genre-filter, [data-genre]").forEach((item) => {
+      item.classList.remove("active");
+    });
 
-function playCard(card) {
-  if (!card) return;
-
-  document.getElementById("nowTitle").textContent = card.dataset.title;
-  document.getElementById("nowArtist").textContent = card.dataset.artist;
-  document.getElementById("mainPlay").textContent = "Ⅱ";
-
-  notify("Aperçu : les fichiers audio seront ajoutés au catalogue.");
-}
-
-document.querySelectorAll(".play-cover").forEach(button => {
-  button.addEventListener("click", () => {
-    playCard(button.closest(".track-card"));
+    button.classList.add("active");
   });
 });
 
-const mainPlay = document.getElementById("mainPlay");
+// ======================================
+// 9. LECTEUR AUDIO
+// ======================================
 
-if (mainPlay) {
-  mainPlay.addEventListener("click", () => {
-    mainPlay.textContent =
-      mainPlay.textContent === "▶" ? "Ⅱ" : "▶";
+const audio = new Audio();
+audio.preload = "none";
 
-    if (
-      !document.getElementById("nowTitle").textContent.includes("Choisis")
-    ) {
-      notify("La lecture réelle sera activée avec les fichiers audio.");
+let currentTrackButton = null;
+
+$$("[data-audio], .play-btn, .track-play").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const card = button.closest(
+      ".track-card, .music-card, .song-card"
+    );
+
+    const audioUrl =
+      button.dataset.audio ||
+      card?.dataset.audio ||
+      card?.querySelector("audio")?.src;
+
+    if (!audioUrl) {
+      showMessage(
+        "Cette musique est une démonstration. Aucun fichier audio n'est encore associé."
+      );
+      return;
+    }
+
+    if (audio.src === new URL(audioUrl, window.location.href).href) {
+      if (audio.paused) {
+        await audio.play();
+        button.classList.add("playing");
+      } else {
+        audio.pause();
+        button.classList.remove("playing");
+      }
+
+      return;
+    }
+
+    if (currentTrackButton) {
+      currentTrackButton.classList.remove("playing");
+    }
+
+    audio.src = audioUrl;
+    currentTrackButton = button;
+
+    try {
+      await audio.play();
+      button.classList.add("playing");
+    } catch (error) {
+      console.error("Erreur lecture audio :", error);
+      showMessage("Impossible de lire ce fichier audio.");
     }
   });
+});
+
+audio.addEventListener("ended", () => {
+  if (currentTrackButton) {
+    currentTrackButton.classList.remove("playing");
+  }
+});
+
+// ======================================
+// 10. FAVORIS
+// ======================================
+
+$$(".favorite-btn, [data-favorite]").forEach((button) => {
+  button.addEventListener("click", () => {
+    button.classList.toggle("active");
+
+    const icon = button.querySelector("i");
+
+    if (icon) {
+      icon.classList.toggle("fas");
+      icon.classList.toggle("far");
+    }
+  });
+});
+
+// ======================================
+// 11. MENU MOBILE
+// ======================================
+
+const menuButton = $(".menu-toggle");
+const sidebar = $(".sidebar");
+
+if (menuButton && sidebar) {
+  menuButton.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+  });
 }
 
-// ======================================
-// FAVORIS DE DÉMONSTRATION
-// ======================================
-
-document.querySelectorAll(".heart").forEach(button => {
-  button.addEventListener("click", () => {
-    button.textContent = button.textContent === "♡" ? "♥" : "♡";
-    notify("Les favoris seront enregistrés dans ton compte prochainement.");
+// Fermer le menu après sélection d'un lien
+$$(".sidebar a").forEach((link) => {
+  link.addEventListener("click", () => {
+    sidebar?.classList.remove("open");
   });
 });
 
-document.querySelectorAll(".track-foot span:last-child").forEach(button => {
-  button.addEventListener("click", () => {
-    button.textContent = button.textContent === "♡" ? "♥" : "♡";
-    notify("Favori sélectionné.");
-  });
-});
+// ======================================
+// 12. ANNEE AUTOMATIQUE
+// ======================================
 
-console.log("AfrikaStream : Firebase est initialisé.");
+const yearElement = $("#currentYear");
+
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
+
+console.log("AfrikaStream : application initialisée.");
