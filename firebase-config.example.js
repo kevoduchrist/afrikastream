@@ -1,11 +1,9 @@
-// Exemple de configuration Firebase.
-// Renomme ce fichier en firebase-config.js et ajoute les clés de TON projet Firebase.
-// Ne partage jamais de clé privée de compte de service.
-export const firebaseConfig = {
-  apiKey: "A_REMPLACER",
-  authDomain: "TON_PROJET.firebaseapp.com",
-  projectId: "TON_PROJET",
-  storageBucket: "TON_PROJET.appspot.com",
-  messagingSenderId: "A_REMPLACER",
-  appId: "A_REMPLACER"
+const firebaseConfig = {
+  apiKey: "AIzaSyAh41ctPYgMPa0Ggf9BHZzsPVy0f928nkw",
+  authDomain: "afrikastream-e50cd.firebaseapp.com",
+  projectId: "afrikastream-e50cd",
+  storageBucket: "afrikastream-e50cd.firebasestorage.app",
+  messagingSenderId: "260671695361",
+  appId: "1:260671695361:web:d7b8974007d0977dbb2e00",
+  measurementId: "G-PL6YDEXFBR"
 };
