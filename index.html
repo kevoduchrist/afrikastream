@@ -81,6 +81,22 @@
   <div class="modal" id="loginModal" aria-hidden="true"><div class="modal-card"><button class="modal-close" aria-label="Fermer">×</button><span class="eyebrow">BIENVENUE</span><h2>Content de te revoir.</h2><p>Connecte-toi pour retrouver ta bibliothèque.</p><form id="loginForm"><label>Adresse e-mail<input type="email" placeholder="toi@exemple.com" required></label><label>Mot de passe<input type="password" placeholder="Ton mot de passe" required></label><button class="primary-btn full" type="submit">Se connecter</button></form><small>La connexion sera activée lors du branchement Firebase.</small></div></div>
   <div class="modal" id="artistModal" aria-hidden="true"><div class="modal-card"><button class="modal-close" aria-label="Fermer">×</button><span class="eyebrow">ESPACE ARTISTE</span><h2>Fais entendre ton talent.</h2><p>Préinscris ton profil artiste. La publication sera ouverte après validation du compte.</p><form id="artistForm"><label>Nom d'artiste<input type="text" placeholder="Ton nom de scène" required></label><label>Adresse e-mail<input type="email" placeholder="toi@exemple.com" required></label><label>Numéro Mobile Money<input type="tel" placeholder="+229 ..." required></label><label>Ton style musical<select required><option value="">Choisir un style</option><option>Afrobeats</option><option>Rap</option><option>Gospel</option><option>R&B</option><option>Traditionnel</option><option>Autre</option></select></label><button class="primary-btn full" type="submit">Envoyer ma préinscription</button></form><small>Démo : aucune donnée n'est envoyée ni enregistrée.</small></div></div>
   <div class="toast" id="toast" role="status"></div>
-  <script src="script.js"></script>
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+  import firebaseConfig from "./firebase-config.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.firebaseApp = app;
+  window.firebaseAuth = auth;
+  window.firebaseDB = db;
+</script>
+
+<script src="script.js"></script>
 </body>
 </html>
